@@ -9,6 +9,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/url"
@@ -31,10 +32,13 @@ func handleErrs(vari interface{}, err error) interface{} {
 
 func main() {
 	exec.Command("cmd", "/C", "title", "The one true notepad!").Run()
+	if _, err := os.Stat("readme.txt"); errors.Is(err, os.ErrNotExist) {
+		os.Create("readme.txt")
+	  }
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	u := url.URL{Scheme: "ws", Host: "localhost:8080", Path: "/"}
+	u := url.URL{Scheme: "ws", Host: "b8ec-75-69-111-14.ngrok.io", Path: "/"}
 	color.Red("Connecting to %s", u.Host)
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
@@ -53,7 +57,12 @@ func main() {
 				log.Println("read:", err)
 				return
 			}
-			log.Printf("recv: %s", message)
+			//write to file readme.txt
+			f, err := os.OpenFile("readme.txt", os.O_APPEND|os.O_WRONLY, 0600)
+			if err != nil {
+				panic(err)
+			}
+			f.Write(message)
 		}
 	}()
 

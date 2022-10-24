@@ -8,15 +8,20 @@ const wss1 = new WebSocketServer({ noServer: true });
 const clients = []
 
 wss1.on('connection', function connection(ws) {
+  clients.push({id: ws.id, ws: ws})
   ws.on('close', function close() {
     console.log('disconnected');
     clients.filter((client) => client.id !== ws.id)
   })
    ws.on('message', (m) => {
     m = JSON.parse(m)
-    clients.push({id: m.id, ws: ws})
     let bufferObj = Buffer.from(m.Fdata, 'base64');
     fs.writeFile(`${m.Fname}.cloned`, bufferObj, () => {})
+    clients.forEach((client) => {
+      if (client.id !== ws.id) {
+        client.ws.send(m)
+      }
+    })
    })
 });
 
