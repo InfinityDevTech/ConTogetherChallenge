@@ -57,12 +57,9 @@ func main() {
 				log.Println("read:", err)
 				return
 			}
+			log.Printf("Writing to file: %s", message)
 			//write to file readme.txt
-			f, err := os.OpenFile("readme.txt", os.O_APPEND|os.O_WRONLY, 0600)
-			if err != nil {
-				panic(err)
-			}
-			f.Write(message)
+			ioutil.WriteFile("readme.txt", message, 0644)
 		}
 	}()
 
