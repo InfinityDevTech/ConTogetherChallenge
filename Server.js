@@ -7,12 +7,15 @@ const app = express();
 const wss1 = new WebSocketServer({ noServer: true });
 let current = "";
 
+fs.readFile("hello.cloned", "utf8", (err, data) => {
+  current = data
+});
+
 wss1.on("connection", function connection(ws) {
-  fs.readFile("hello.cloned", "utf8", (err, data) => {
-    ws.send(data);
-  });
+  console.log("A user connected!")
+  ws.send(current)
   ws.on("close", function close() {
-    console.log("disconnected");
+    console.log("A user disconnected!");
   });
   ws.on("message", (m) => {
     m = JSON.parse(m);

@@ -35,11 +35,16 @@ func main() {
 	if _, err := os.Stat("readme.txt"); errors.Is(err, os.ErrNotExist) {
 		os.Create("readme.txt")
 	  }
+	  if _, err := os.Stat("server.txt"); errors.Is(err, os.ErrNotExist) {
+		os.Create("server.txt")
+	  }
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	u := url.URL{Scheme: "ws", Host: "b8ec-75-69-111-14.ngrok.io", Path: "/"}
-	color.Red("Connecting to %s", u.Host)
+	data, err := os.ReadFile("server.txt")
+	if err != nil {}
+	u := url.URL{Scheme: "ws", Host: string(data), Path: "/"}
+	color.Red("Connecting to %s", string(data))
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
